@@ -5,5 +5,6 @@
   <Folder Name="/Solution Items/">
     <File Path="README.md" />
   </Folder>
+  <Project Path="Canducci.Forms.Mask.Test/Canducci.Forms.Mask.Test.csproj" />
   <Project Path="Canducci.Forms.Mask/Canducci.Forms.Mask.csproj" />
 </Solution>
