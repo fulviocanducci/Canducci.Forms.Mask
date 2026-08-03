@@ -19,6 +19,42 @@ public sealed class MaskCurrency : IDisposable
     public event EventHandler? ValueChanged;
 
     /// <summary>
+    /// Occurs when the attached <see cref="TextBox"/> loses focus (Leave).
+    /// </summary>
+    /// <remarks>
+    /// This event is raised after the mask has reformatted the text. Subscribe to perform
+    /// additional actions when the control loses focus. Use <see cref="Detach"/> or
+    /// <see cref="Dispose"/> to stop receiving events.
+    /// </remarks>
+    public event EventHandler? LeaveCalled;
+
+    /// <summary>
+    /// Occurs when a key is pressed in the attached <see cref="TextBox"/> before internal handling.
+    /// </summary>
+    /// <remarks>
+    /// External handlers receive the original <see cref="KeyPressEventArgs"/> instance.
+    /// If a handler sets <c>e.Handled = true</c>, the internal mask processing for that key is skipped.
+    /// </remarks>
+    public event KeyPressEventHandler? KeyPressCalled;
+
+    /// <summary>
+    /// Occurs when the attached <see cref="TextBox"/> raises <see cref="Control.PreviewKeyDown"/>.
+    /// </summary>
+    /// <remarks>
+    /// Use this event to observe or preprocess preview key events before the standard key handling occurs.
+    /// </remarks>
+    public event PreviewKeyDownEventHandler? PreviewKeyDownCalled;
+
+    /// <summary>
+    /// Occurs when the attached <see cref="TextBox"/> text changes. Invoked before internal parsing/formatting.
+    /// </summary>
+    /// <remarks>
+    /// This event is raised prior to the internal parse/format logic. Handlers can inspect or validate
+    /// the raw text; to override internal behavior prefer using <see cref="KeyPressCalled"/> for key events.
+    /// </remarks>
+    public event EventHandler? TextChangedCalled;
+
+    /// <summary>
     /// Gets or sets the current decimal value represented by the mask.
     /// Setting will update the attached <see cref="TextBox"/> text.
     /// </summary>
@@ -59,9 +95,23 @@ public sealed class MaskCurrency : IDisposable
         _textBox = textBox ?? throw new ArgumentNullException(nameof(textBox));
         _culture = culture ?? new CultureInfo("pt-BR");
         _textBox.TextAlign = HorizontalAlignment.Right;
-
+        _valueInCents = CurrencyFormatter.FromDecimal(initialValue);
+        if (_textBox.IsHandleCreated)
+        {
+            UpdateText();
+        }
+        else
+        {
+            _textBox.HandleCreated += TextBox_HandleCreatedInitial;
+        }
         AttachEvents();
         Value = initialValue;
+    }
+
+    private void TextBox_HandleCreatedInitial(object? s, EventArgs e)
+    {
+        _textBox.HandleCreated -= TextBox_HandleCreatedInitial;
+        UpdateText();
     }
 
     /// <summary>
@@ -94,17 +144,22 @@ public sealed class MaskCurrency : IDisposable
 
     private void TextBox_PreviewKeyDown(object? sender, PreviewKeyDownEventArgs e)
     {
+        PreviewKeyDownCalled?.Invoke(this, e);
     }
 
     private void TextBox_Leave(object? sender, EventArgs e)
     {
         UpdateText();
+        LeaveCalled?.Invoke(this, EventArgs.Empty);
     }
 
     private void TextBox_TextChanged(object? sender, EventArgs e)
     {
-        if (_disposed) return;
-
+        if (_disposed)
+        {
+            return;
+        }
+        TextChangedCalled?.Invoke(this, EventArgs.Empty);
         if (CurrencyFormatter.TryParse(_textBox.Text, _culture, out var cents))
         {
             if (cents != _valueInCents)
@@ -123,6 +178,11 @@ public sealed class MaskCurrency : IDisposable
     private void TextBox_KeyPress(object? sender, KeyPressEventArgs e)
     {
         if (_disposed)
+        {
+            return;
+        }
+        KeyPressCalled?.Invoke(this, e);
+        if (e.Handled)
         {
             return;
         }
@@ -162,7 +222,7 @@ public sealed class MaskCurrency : IDisposable
 
     private void UpdateText()
     {
-        if (_textBox.IsDisposed || !_textBox.IsHandleCreated)
+        if (_textBox.IsDisposed)
         {
             return;
         }

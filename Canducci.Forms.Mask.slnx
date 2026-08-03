@@ -1,3 +1,9 @@
 <Solution>
+  <Folder Name="/Forms/">
+    <Project Path="WinForm/WinForm.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
   <Project Path="Canducci.Forms.Mask/Canducci.Forms.Mask.csproj" />
 </Solution>
