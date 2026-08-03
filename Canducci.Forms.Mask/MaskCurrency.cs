@@ -9,7 +9,7 @@ namespace Canducci.Forms.Mask;
 public sealed class MaskCurrency : IDisposable
 {
     private readonly TextBox _textBox;
-    private readonly CultureInfo _culture;
+    private CultureInfo _culture;
     private long _valueInCents;
     private bool _disposed;
 
@@ -70,6 +70,24 @@ public sealed class MaskCurrency : IDisposable
             _valueInCents = newCents;
             UpdateText();
             ValueChanged?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the culture used for formatting the currency value.
+    /// </summary>
+    public CultureInfo Culture
+    {
+        set
+        {
+            EnsureNotDisposed();
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            _culture = value;
+            UpdateText();
+        }
+        get
+        {
+            return _culture;
         }
     }
 

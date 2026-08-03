@@ -5,5 +5,23 @@
         <UseWindowsForms>true</UseWindowsForms>
         <ImplicitUsings>enable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <AssemblyTitle>Canducci.Forms.Mask</AssemblyTitle>        
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <Version>0.0.1</Version>
+        <PackageIcon>ico.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
+    <ItemGroup>
+      <Content Include="ico.png" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="..\ico.png">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
+      </None>
+      <None Include="..\README.md">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
+      </None>      
+    </ItemGroup>
 </Project>

@@ -11,10 +11,9 @@ namespace WinForm
 
         private void FrmExample_Load(object sender, EventArgs e)
         {
-            var maskBr = TxtCurrencyBr.MaskCurrency(100, new CultureInfo("pt-BR"));
+            MaskCurrency maskBr = TxtCurrencyBr.MaskCurrency(100m, new CultureInfo("pt-BR"));
             maskBr.LeaveCalled += MaskBr_LeaveCalled;
-
-            TxtCurrencyUs.MaskCurrency(new CultureInfo("en-US"));
+            TxtCurrencyUs.MaskCurrency(culture: new CultureInfo("en-US"));
         }
 
         private void MaskBr_LeaveCalled(object? sender, EventArgs e)
